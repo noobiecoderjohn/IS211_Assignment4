@@ -1,6 +1,3 @@
-import argparse
-# other imports go here
-
 import random
 import time
 
@@ -13,7 +10,6 @@ def get_me_random_list(n):
     a_list = list(range(n))
     random.shuffle(a_list)
     return a_list
-    
 
 def insertion_sort(a_list):
     for index in range(1, len(a_list)):
@@ -26,30 +22,21 @@ def insertion_sort(a_list):
 
         a_list[position] = current_value
 
+def shell_sort(a_list):
+    sublist_count = len(a_list) // 2
+    while sublist_count > 0:
+        for start_position in range(sublist_count):
+            gap_insertion_sort(a_list, start_position, sublist_count)
+        sublist_count = sublist_count // 2
 
-def shellSort(alist):
-    sublistcount = len(alist)//2
-    while sublistcount > 0:
-        for startposition in range(sublistcount):
-            gapInsertionSort(alist,startposition,sublistcount)
-
-        print("After increments of size", sublistcount, "The list is",alist)
-
-        sublistcount = sublistcount // 2
-
-
-def gapInsertionSort(alist, start, gap):
-
-    for i in range(start+gap, len(alist), gap):
-        currentvalue = alist[i]
+def gap_insertion_sort(a_list, start, gap):
+    for i in range(start + gap, len(a_list), gap):
+        current_value = a_list[i]
         position = i
-
-        while position >= gap and alist[position-gap] > currentvalue:
-            alist[position] = alist[position-gap]
+        while position >= gap and a_list[position - gap] > current_value:
+            a_list[position] = a_list[position - gap]
             position = position - gap
-
-        alist[position] = currentvalue
-
+        a_list[position] = current_value
 
 def python_sort(a_list):
     """
@@ -58,36 +45,43 @@ def python_sort(a_list):
     :param a_list:
     :return: the sorted list
     """
-    return sorted(a_list)
+    start_time = time.time()
+    sorted_list = sorted(a_list)
+    end_time = time.time()
+    return sorted_list, end_time - start_time
 
-
-if __name__ == "__main__":
-    """Main entry point"""
+def main():
     list_sizes = [500, 1000, 5000]
 
-    # the_size = list_sizes[0]
+    for size in list_sizes:
+        print(f"For list size {size}:")
+        
+        total_time_insertion = 0
+        total_time_shell = 0
+        total_time_python = 0
 
-    for the_size in list_sizes:
-        total_time = 0
-        for i in range(100):
-            mylist500 = get_me_random_list(the_size)
-            start = time.time()
-            sorted_list = python_sort(mylist500)
-            time_spent = time.time() - start
-            total_time += time_spent
+        for _ in range(100):
+            random_list = get_me_random_list(size)
 
-        avg_time = total_time / 100
-        print(f"Python sort took {avg_time:10.7f} seconds to run, on average for a list of {the_size} elements")
+            start_time = time.time()
+            insertion_sort(random_list.copy())
+            total_time_insertion += time.time() - start_time
 
-        total_time = 0
-        for i in range(100):
-            mylist500 = get_me_random_list(the_size)
-            start = time.time()
-            insertion_sort(mylist500)
-            time_spent = time.time() - start
-            total_time += time_spent
+            start_time = time.time()
+            shell_sort(random_list.copy())
+            total_time_shell += time.time() - start_time
 
-        # Repeat the same loop and use shellSort(...)
+            start_time = time.time()
+            python_sort(random_list.copy())
+            total_time_python += time.time() - start_time
 
-        avg_time = total_time / 100
-        print(f"Insertion sort took {avg_time:10.7f} seconds to run, on average for a list of {the_size} elements")
+        avg_time_insertion = total_time_insertion / 100
+        avg_time_shell = total_time_shell / 100
+        avg_time_python = total_time_python / 100
+
+        print(f"Insertion Sort took {avg_time_insertion:10.7f} seconds to run, on average")
+        print(f"Shell Sort took {avg_time_shell:10.7f} seconds to run, on average")
+        print(f"Python Sort took {avg_time_python:10.7f} seconds to run, on average")
+
+if __name__ == "__main__":
+    main()
